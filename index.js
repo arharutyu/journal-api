@@ -47,7 +47,7 @@ app.post('/entries', async (req, res) => {
   try {  
     const theCat = await CategoryModel.findOne({ name: req.body.category })
     if (theCat) {
-      const insertedEntry = await EntryModel.create({ content: req.body.content, category: theCat._id})
+      const insertedEntry = await EntryModel.create({ content: req.body.content, category: theCat})
       res.status(201).send(insertedEntry)
     } else {
       res.status(400).send({ error: 'Category not found'})
@@ -68,7 +68,7 @@ app.put('/entries/:id', async (req, res) => {
     if (req.body.category) {
       const theCat = await CategoryModel.findOne({ name: req.body.category })
       if (theCat) {
-        updatedEntry.category = theCat._id
+        updatedEntry.category = theCat
       } else {
       res.status(400).send({ error: 'Category not found' })
       }
