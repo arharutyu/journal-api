@@ -1,6 +1,7 @@
 import express from 'express'
 import { EntryModel, CategoryModel } from './db.js'
 import entryRoutes from './routes/entry_routes.js'
+import catRoutes from './routes/category_routes.js'
 
 // initialize express instance
 const app = express()
@@ -12,10 +13,9 @@ app.use(express.json())
 // GET route for home page
 app.get('/', (request, response) => response.send({ info: 'Journal API!'}))
 
-// GET all categories
-// use find method on Category Model to return all categories
-app.get('/categories', async (req, res) => res.send(await CategoryModel.find()))
 
 app.use('/entries', entryRoutes)
+
+app.use('/categories', catRoutes)
 
 app.listen(port)
