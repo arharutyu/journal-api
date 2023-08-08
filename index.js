@@ -2,7 +2,6 @@ import express from 'express'
 import { EntryModel, CategoryModel } from './db.js'
 import entryRoutes from './routes/entry_routes.js'
 
-
 // initialize express instance
 const app = express()
 const port = 4001

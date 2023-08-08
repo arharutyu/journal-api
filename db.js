@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+dotenv.config()
 
 async function dbClose() {
   await mongoose.connection.close()
@@ -6,7 +8,7 @@ async function dbClose() {
 }
 
 // initialize mongoose instance, connect to mongodb db with connection string
-mongoose.connect('mongodb+srv://aharuty:mu5hu@cluster0.ci0rfnb.mongodb.net/journal?retryWrites=true&w=majority')
+mongoose.connect(process.env.ATLAS_DB_URL)
   .then(m => console.log(m.connection.readyState === 1 ? 'Mongoose connected!' : 'Mongoose failed to connect'))
   .catch(err => console.error(err))
 
