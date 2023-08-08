@@ -14,13 +14,14 @@ const entries = [
   {category: 'Gaming', content: 'Animal Crossing is a game.'}
 ]
 
+// initialize mongoose instance, connect to mongodb db with connection string
 mongoose.connect('mongodb+srv://aharuty:mu5hu@cluster0.ci0rfnb.mongodb.net/journal?retryWrites=true&w=majority')
   .then(m => console.log(m.connection.readyState === 1 ? 'Mongoose connected!' : 'Mongoose failed to connect'))
   .catch(err => console.error(err))
 
 // Entries Schema & Model
 const entrySchema = new mongoose.Schema({
-  category: {type: String, required: true},
+  category: {type: mongoose.ObjectId, ref: 'Category'},
   content: {type: String, required: true}
  })
 
@@ -28,16 +29,27 @@ const EntryModel = mongoose.model('Entry', entrySchema)
 
 // Category Schema & Model
 const categorySchema = new mongoose.Schema({
-  name: {type: String, required: true }
+  name: {type: String, required: true, unique: true }
 })
 
 const CategoryModel = new mongoose.model('Category', categorySchema)
 
+// // get category
+// async function addEntry() {
+//   const theCat = await CategoryModel.findOne({ name: 'Coding' })
+// // create entry using category id 
+//   EntryModel.create({ content: 'Testing category ref', category: theCat._id })
+// }
+// addEntry()
+
+// initialize express instance
 const app = express()
 const port = 4001
 
+// middleware to accept JSON data in request body
 app.use(express.json())
 
+// GET route for home page
 app.get('/', (request, response) => response.send({ info: 'Journal API!'}))
 
 // GET all categories
@@ -72,13 +84,14 @@ app.get('/entries/:id', async (req, res) => {
 
 // POST entry
 app.post('/entries', async (req, res) => {
-  // using await to wait for the creation of the doc to finish, so add async in callback function above for req, res
-  // wrap in try catch block to gracefully handle errors
   try {  
-    // create new entry using Entry Model, passing in request body
-    const insertedEntry = await EntryModel.create(req.body)
-    //  send response 201 created status, and inserted entry
-    res.status(201).send(insertedEntry)
+    const theCat = await CategoryModel.findOne({ name: req.body.category })
+    if (theCat) {
+      const insertedEntry = await EntryModel.create({ content: req.body.content, category: theCat._id})
+      res.status(201).send(insertedEntry)
+    } else {
+      res.status(400).send({ error: 'Category not found'})
+    }
   }
   catch (err) {
     res.status(500).send({ error: err.message })
@@ -88,17 +101,25 @@ app.post('/entries', async (req, res) => {
 // PUT (update) entry
 app.put('/entries/:id', async (req, res) => {
   try {
-    // get entry by params id
-    // pass options object set new: true to return updated entry instead of original
-    const entry = await EntryModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    // if truthey (entry exists)
-      if (entry) {
-        res.send(entry)
+    const updatedEntry = {}
+    if (req.body.content) {
+      updatedEntry.content = req.body.content
+    }
+    if (req.body.category) {
+      const theCat = await CategoryModel.findOne({ name: req.body.category })
+      if (theCat) {
+        updatedEntry.category = theCat._id
       } else {
-        // otherwise send 404 status and error object
-        res.status(404).send({ error: 'Entry not found' })
+      res.status(400).send({ error: 'Category not found' })
       }
-  }
+    }
+      const entry = await EntryModel.findByIdAndUpdate(req.params.id, updatedEntry, { new: true })
+        if (entry) {
+          res.send(entry)
+        } else {
+          res.status(404).send({ error: 'Entry not found' })
+        }
+    }
   catch (err) {
     res.status(500).send({ error: err.message })
   }
