@@ -1,46 +1,6 @@
 import express from 'express'
-import mongoose from 'mongoose'
+import { EntryModel, CategoryModel } from './db.js'
 
-const categories = [
-  { name: 'Food'}, 
-  { name: 'Gaming'}, 
-  { name: 'Coding'}, 
-  { name:  'Other'}
-]
-
-const entries = [
-  {category: 'Food', content: 'Is energy'},
-  {category: 'Coding', content: 'Coding is fun'},
-  {category: 'Gaming', content: 'Animal Crossing is a game.'}
-]
-
-// initialize mongoose instance, connect to mongodb db with connection string
-mongoose.connect('mongodb+srv://aharuty:mu5hu@cluster0.ci0rfnb.mongodb.net/journal?retryWrites=true&w=majority')
-  .then(m => console.log(m.connection.readyState === 1 ? 'Mongoose connected!' : 'Mongoose failed to connect'))
-  .catch(err => console.error(err))
-
-// Entries Schema & Model
-const entrySchema = new mongoose.Schema({
-  category: {type: mongoose.ObjectId, ref: 'Category'},
-  content: {type: String, required: true}
- })
-
-const EntryModel = mongoose.model('Entry', entrySchema)
-
-// Category Schema & Model
-const categorySchema = new mongoose.Schema({
-  name: {type: String, required: true, unique: true }
-})
-
-const CategoryModel = new mongoose.model('Category', categorySchema)
-
-// // get category
-// async function addEntry() {
-//   const theCat = await CategoryModel.findOne({ name: 'Coding' })
-// // create entry using category id 
-//   EntryModel.create({ content: 'Testing category ref', category: theCat._id })
-// }
-// addEntry()
 
 // initialize express instance
 const app = express()
