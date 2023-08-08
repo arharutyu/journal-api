@@ -5,7 +5,8 @@ const router = Router()
 
 // GET all entries
 // use find method on Entry Model to return all entries
-router.get('/', async (req, res) => res.send(await EntryModel.find()))
+// use populate() method on Entry Model to populate with object provided in path. Use optional select for specific fields only
+router.get('/', async (req, res) => res.send(await EntryModel.find().populate({ path: 'category', select: '-_id name' })))
 
 // GET single entry by id
 router.get('/:id', async (req, res) => {
@@ -15,7 +16,7 @@ router.get('/:id', async (req, res) => {
   try {
   // linking search to db. Use findbyId search method and pass in id from params
   // use await and add async to function as using Promise (EntryModel)
-  const entry = await EntryModel.findById(req.params.id)
+  const entry = await EntryModel.findById(req.params.id).populate({ path: 'category', select: '-_id name' })
   // if truthey (exists) send entry
     if (entry) {
       res.send(entry)
