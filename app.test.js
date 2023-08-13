@@ -1,8 +1,6 @@
 import app from './app.js'
 import request from 'supertest'
 
-const validNames = ['Food', 'Gaming', 'Coding', 'Other']
-
 describe("App Test", () => {
   test('GET /', async () => {
     const res = await request(app).get('/')
