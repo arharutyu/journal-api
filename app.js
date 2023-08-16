@@ -14,7 +14,7 @@ app.use(cors())
 app.use(express.json())
 
 // GET route for home page
-app.get('/', (request, response) => response.send({ info: 'Journal API!'}))
+app.get('/', (request, response) => response.send({ info: 'Journal API!!'}))
 
 
 app.use('/entries', entryRoutes)
